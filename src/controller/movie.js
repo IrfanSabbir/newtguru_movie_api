@@ -1,5 +1,4 @@
-
-const Movie = require("../model/movie")
+const Movie = require('../model/movie')
 const axios = require('axios');
 
 exports.createMovie = async (req, res) => {
@@ -17,6 +16,7 @@ exports.createMovie = async (req, res) => {
           { createdAt: { $lt: endDate } },
         ]
       });
+      
       if (count > 4) {
         throw new Error("Your Monthly Limit Ended.")
       }
@@ -29,7 +29,8 @@ exports.createMovie = async (req, res) => {
     if (isExist) {
       throw new Error("Movie already exist in the server.")
     }
-    const result = await axios.get(`http://www.omdbapi.com/?t=${req.body.title}&apikey=${process.env.apikey}`);
+    const omdbApi = `http://www.omdbapi.com/?t=${req.body.title}&apikey=${process.env.apikey}`;
+    const result = await axios.get(omdbApi);
 
     if (result.data['Response'] === 'True') {
 
@@ -40,6 +41,7 @@ exports.createMovie = async (req, res) => {
         director: result.data['Director'],
         userId: req.userData.userId
       })
+
       await movie.save();
 
       res.status(200).json({
@@ -47,8 +49,8 @@ exports.createMovie = async (req, res) => {
         body: movie,
         error: false
       });
-    }
-    else {
+
+    } else {
       throw new Error(result.data['Error']);
     }
   } catch (error) {
@@ -63,7 +65,6 @@ exports.createMovie = async (req, res) => {
 
 exports.fetchMovies = async (req, res) => {
   try {
-
     const movies = await Movie.find({
       userId: req.userData.userId,
     });
@@ -73,9 +74,10 @@ exports.fetchMovies = async (req, res) => {
       body: movies,
       error: false
     });
+
   } catch (error) {
+
     res.status(400).json({
-      status: "try again please.",
       message: error.message,
       body: [],
       error: true

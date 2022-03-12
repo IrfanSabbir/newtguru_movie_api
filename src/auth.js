@@ -41,7 +41,7 @@ const authFactory = (secret) => (username, password) => {
   );
 };
 
-const authCheck =(secret) => (req, res, next) => {
+const authCheck = (secret) => (req, res, next) => {
 
   if(!req.headers.authorization){
       throw new AuthError("Authorization header not found")
